@@ -126,6 +126,59 @@ char *generatePwd(char *charList, int length) {
     return pwd;
 }
 
+int checkPasswordStrength(const char *password) {
+    int strength = 0;
+
+    // Define password strength criteria
+    int min_length = 8;
+    bool has_upper = false;
+    bool has_lower = false;
+    bool has_digit = false;
+    bool has_special = false;
+
+    // Get the length of the password
+    int length = strlen(password);
+
+    // Iterate through the characters in the password
+    for (int i = 0; i < length; i++) {
+        char c = password[i];
+
+        // Check for uppercase letters, lowercase letters, digits, and special characters
+        if (isupper(c)) {
+            has_upper = true;
+        } else if (islower(c)) {
+            has_lower = true;
+        } else if (isdigit(c)) {
+            has_digit = true;
+        } else {
+            // Check for special characters (customize this based on your requirements)
+            char special_chars[] = "!@#$%^&*()-_=+[]{};:',.<>?/";
+            if (strchr(special_chars, c) != NULL) {
+                has_special = true;
+            }
+        }
+    }
+
+    // Increase the strength score for meeting each criterion
+    if (length >= min_length) {
+        strength += 2;
+    }
+    if (has_upper) {
+        strength += 2;
+    }
+    if (has_lower) {
+        strength += 2;
+    }
+    if (has_digit) {
+        strength += 2;
+    }
+    if (has_special) {
+        strength += 2;
+    }
+
+    return strength;
+}
+
 int main(int argc, char const *argv[]) {
     if (argc < 3) {
         perror("Not enough arguments");
@@ -146,9 +199,12 @@ int main(int argc, char const *argv[]) {
 
     char *charList = parseRequirements(argv[2]);
     char *pwd = generatePwd(charList, length);
+    
+    int strength = checkPasswordStrength(pwd);
+    
+    printf("Generated Password: %s\n", pwd, "Password Strength: %d\n", strength);
 
-    printf("Generated Password: %s\n", pwd);
-
+    free(strength); // Free allocated memory for strength
     free(charList); // Free allocated memory for charList
     free(pwd);      // Free allocated memory for pwd
 
